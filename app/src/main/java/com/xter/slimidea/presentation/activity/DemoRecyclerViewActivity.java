@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
+
 /**
  * Created by XTER on 2019/3/19.
  * recyclerview的测试
@@ -58,8 +60,9 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 //		snapHelper.attachToRecyclerView(rvDemo);
 //		lineSnapHelper.attachToRecyclerView(rvDemo);
 
-		SnapHelper snapHelper = new HorizontalLinearSnapHelper(AlignMode.START,0,40f);
+		HorizontalLinearSnapHelper snapHelper = new HorizontalLinearSnapHelper(AlignMode.END, 0, 40f);
 		snapHelper.attachToRecyclerView(rvDemo);
+		rvDemo.addOnScrollListener(snapHelper.scrollListener);
 
 
 		textViewAdapter = new TextViewAdapter(this, R.layout.item_text, dataDemo);
@@ -165,6 +168,34 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 
 		private static final float INVALID_DISTANCE = 1f;
 
+		private int currentAbosolutePosition;
+
+		public RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+				super.onScrollStateChanged(recyclerView, newState);
+				if (newState == SCROLL_STATE_DRAGGING) {
+					switch (alignMode) {
+						case START:
+							currentAbosolutePosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+							break;
+						case CENTER:
+							currentAbosolutePosition = (((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition() + ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition()) / 2;
+							break;
+						case END:
+							currentAbosolutePosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+							break;
+					}
+					L.w("abosolute=" + currentAbosolutePosition);
+				}
+			}
+
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+//				L.i("dx="+dx+",dy="+dy);
+			}
+		};
 
 		public OrientationHelper getHorizontalHelper(RecyclerView.LayoutManager layoutManager) {
 			if (orientationHelper == null)
@@ -175,6 +206,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 		@Nullable
 		@Override
 		public int[] calculateDistanceToFinalSnap(@NonNull RecyclerView.LayoutManager layoutManager, @NonNull View targetView) {
+			L.i("---------");
 			int[] out = new int[2];
 			if (layoutManager.canScrollHorizontally()) {
 				switch (alignMode) {
@@ -191,6 +223,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 			} else {
 				out[0] = 0;
 			}
+			L.d("out="+out[0]);
 			return out;
 		}
 
@@ -217,15 +250,16 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 
 		private int distanceToEnd(RecyclerView.LayoutManager layoutManager, View targetView, OrientationHelper helper) {
 			if (layoutManager.getClipToPadding()) {
-				return helper.getDecoratedEnd(targetView);
+				return helper.getEnd() - helper.getDecoratedEnd(targetView);
 			} else {
-				return helper.getDecoratedEnd(targetView) + helper.getEndAfterPadding();
+				return helper.getEnd() - helper.getDecoratedEnd(targetView) + helper.getEndAfterPadding();
 			}
 		}
 
 		@Nullable
 		@Override
 		public View findSnapView(RecyclerView.LayoutManager layoutManager) {
+			L.i("-------");
 			switch (alignMode) {
 				case START:
 					return findStartView(layoutManager, getHorizontalHelper(layoutManager));
@@ -252,7 +286,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 				View firstChildView = layoutManager.findViewByPosition(firstChildPosition);
 
 				//超过一半被遮住就考虑下一个，否则就当前
-				if (helper.getDecoratedEnd(firstChildView) >= helper.getDecoratedMeasurement(firstChildView) / 2 && helper.getDecoratedEnd(firstChildView) > 0) {
+				if (helper.getDecoratedEnd(firstChildView) > helper.getDecoratedMeasurement(firstChildView) / 2) {
 					return firstChildView;
 				} else {
 					return layoutManager.findViewByPosition(firstChildPosition + 1);
@@ -279,7 +313,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 			if (firstChildPosition == RecyclerView.NO_POSITION) {
 				return null;
 			}
-			int lastChildPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+			int lastChildPosition = ((LinearLayoutManager) layoutManager).findLastCompletelyVisibleItemPosition();
 			View lastChildView = layoutManager.findViewByPosition(lastChildPosition);
 			if ((layoutManager.getClipToPadding() ? helper.getEndAfterPadding() : helper.getEnd()) - helper.getDecoratedStart(lastChildView) > (helper.getDecoratedMeasurement(lastChildView)) / 2) {
 				return lastChildView;
@@ -304,11 +338,15 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 			if (currentView == null) {
 				return RecyclerView.NO_POSITION;
 			}
+			L.w("find snap = " + layoutManager.getPosition(currentView));
 
-			final int currentPosition = layoutManager.getPosition(currentView);
-			if (currentPosition == RecyclerView.NO_POSITION) {
-				return RecyclerView.NO_POSITION;
-			}
+//			final int currentPosition = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+			final int currentPosition = currentAbosolutePosition;
+			L.w("current=" + currentPosition);
+//			final int currentPosition = layoutManager.getPosition(currentView);
+//			if (currentPosition == RecyclerView.NO_POSITION) {
+//				return RecyclerView.NO_POSITION;
+//			}
 
 			RecyclerView.SmoothScroller.ScrollVectorProvider vectorProvider =
 					(RecyclerView.SmoothScroller.ScrollVectorProvider) layoutManager;
@@ -324,13 +362,13 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 			} else {
 				deltaThreshold = onceFlingItemNums;
 			}
-			L.w("threshod="+deltaThreshold);
+			L.w("threshod=" + deltaThreshold);
 
 			int deltaJump;
 			if (layoutManager.canScrollHorizontally()) {
 				deltaJump = estimateNextPositionDiffForFling(layoutManager,
 						getHorizontalHelper(layoutManager), velocityX, 0);
-				L.w("jump="+deltaJump);
+				L.w("jump=" + deltaJump);
 				if (deltaThreshold != 0) {
 					if (deltaJump > deltaThreshold) {
 						deltaJump = deltaThreshold;
@@ -350,6 +388,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 				return RecyclerView.NO_POSITION;
 			}
 			int targetPos = currentPosition + deltaJump;
+			L.w("current=" + currentPosition + ",delta=" + deltaJump + ",target=" + targetPos);
 			if (targetPos < 0) {
 				targetPos = 0;
 			}
@@ -642,7 +681,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 			if (layoutManager.canScrollHorizontally()) {
 				deltaJump = estimateNextPositionDiffForFling(layoutManager,
 						getHorizontalHelper(layoutManager), velocityX, 0);
-				L.w("jump="+deltaJump+",threshold="+deltaThreshold);
+				L.w("jump=" + deltaJump + ",threshold=" + deltaThreshold);
 				if (deltaJump > deltaThreshold) {
 					deltaJump = deltaThreshold;
 				}
