@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.xter.slimidea.common.util.L;
+
 /**
  * 分割线
  */
@@ -113,7 +115,8 @@ public class QuickItemDecoration extends RecyclerView.ItemDecoration {
 	public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
 		if (mOrientation == HORIZONTAL_LIST) {
 			//画横线，就是往下偏移一个分割线的高度
-			outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+			L.i("dividerHeight="+mDivider.getIntrinsicHeight()+",dividerWidth="+mDivider.getIntrinsicWidth());
+			outRect.set(0, 0, mDivider.getIntrinsicWidth(), mDivider.getIntrinsicHeight());
 		} else {
 			//画竖线，就是往右偏移一个分割线的宽度
 			outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
