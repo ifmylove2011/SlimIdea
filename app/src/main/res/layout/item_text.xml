@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="120px"
+              android:layout_width="300px"
               android:layout_height="200px"
               android:padding="15px"
               android:layout_margin="5px"
@@ -10,9 +10,7 @@
     <TextView
         android:id="@+id/tv_demo"
         android:layout_gravity="center"
-        android:textSize="22sp"
-        android:padding="2px"
-        android:layout_margin="3px"
+        android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </LinearLayout>

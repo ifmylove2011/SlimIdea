@@ -2,15 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_demo"
-        android:paddingStart="30px"
-        android:paddingEnd="70px"
+        android:paddingStart="60px"
+        android:paddingEnd="120px"
         android:layout_margin="10px"
+        app:reverseLayout="false"
+        android:clipToPadding="true"
+        android:background="#aa0000"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     </android.support.v7.widget.RecyclerView>
 </LinearLayout>

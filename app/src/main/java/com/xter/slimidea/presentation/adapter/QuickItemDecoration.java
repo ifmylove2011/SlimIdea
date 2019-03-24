@@ -119,7 +119,7 @@ public class QuickItemDecoration extends RecyclerView.ItemDecoration {
 			outRect.set(0, 0, mDivider.getIntrinsicWidth(), mDivider.getIntrinsicHeight());
 		} else {
 			//画竖线，就是往右偏移一个分割线的宽度
-			outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
+			outRect.set(0, 0, mDivider.getIntrinsicWidth(),  mDivider.getIntrinsicHeight());
 		}
 	}
 }
