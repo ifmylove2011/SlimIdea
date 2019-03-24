@@ -1,0 +1,35 @@
+@startuml
+activate snap #pink
+
+box "SnapHelper" #lightblue
+
+
+participant OnFlingListener as fling<< (C,#ADD1B2)  >>
+participant OnScrollListener as scroll << (C,#ADD1B2)  >>
+participant SnapHelper as snaph << (C,#ADD1B2)  >>
+
+participant LinearSmoothScroller as scroller << (C,#ADD1B2)  >>
+
+end box
+
+fling --> fling : onFling
+
+fling -> snaph : snapFromFling
+
+snaph -> snap : findTargetSnapPosition
+snaph -> scroller : createSnapScroller
+
+scroller --> snaph : onTargetFound
+
+snaph -> snap : calculateDistanceToFinalSnap
+
+scroll --> scroll : onScrollStateChanged
+
+scroll -> snaph : snapToTargetExistingView
+
+snaph -> snap : findSnapView
+
+snaph -> snap : calculateDistanceToFinalSnap
+
+deactivate snap
+@enduml

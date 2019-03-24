@@ -1,0 +1,111 @@
+@startuml
+namespace android.support.v7.widget #lightgreen{
+
+class RecyclerView
+
+abstract class OnFlingListener{
+    +{abstract}  boolean onFling(int velocityX, int velocityY)
+}
+
+abstract class OnScrollListener{
+    +void onScrollStateChanged(RecyclerView recyclerView, int newState)
+    +void onScrolled(RecyclerView recyclerView, int dx, int dy)
+}
+
+abstract class LayoutManager
+
+RecyclerView +-[#green]- OnFlingListener
+RecyclerView +-[#green]- OnScrollListener
+RecyclerView +-[#green]- LayoutManager
+
+abstract class OrientationHelper{
+    #RecyclerView.LayoutManager mLayoutManager
+    #Rect mTmpRect
+    +OrientationHelper(RecyclerView.LayoutManager layoutManager)
+    +void onLayoutComplete()
+    +int getTotalSpaceChange()
+    +{abstract} int getDecoratedStart(View view)
+    +{abstract} int getDecoratedEnd(View view)
+    +{abstract} int getTransformedEndWithDecoration(View view)
+    +{abstract} int getTransformedStartWithDecoration(View view)
+    +{abstract} int getDecoratedMeasurement(View view)
+    +{abstract} int getDecoratedMeasurementInOther(View view)
+    +{abstract} void offsetChild(View view, int offset)
+    +{abstract} void offsetChildren(int amount)
+    +{abstract} int getStartAfterPadding()
+    +{abstract} int getEndAfterPadding()
+    +{abstract} int getEnd()
+    +{abstract} int getEndPadding()
+    +{abstract} int getTotalSpace()
+    +{abstract} int getMode()()
+    +{abstract} int getModeInOther()
+    +{abstract} int getTotalSpace()
+    +{static} OrientationHelper createOrientationHelper(RecyclerView.LayoutManager layoutManager, int orientation)
+    +{static} OrientationHelper createHorizontalHelper(RecyclerView.LayoutManager layoutManager)
+    +{static} OrientationHelper createVerticalHelper(RecyclerView.LayoutManager layoutManager)
+}
+
+OrientationHelper --> LayoutManager
+
+abstract class SnapHelper{
+    #{static} float MILLISECONDS_PER_INCH
+    #RecyclerView mRecyclerView
+    -Scroller mGravityScroller
+    -RecyclerView.OnScrollListener mScrollListener
+    +void attachToRecyclerView(RecyclerView recyclerView)
+    -void setupCallbacks()
+    -void destroyCallbacks()
+    +boolean onFling(int velocityX, int velocityY)
+    +int[] calculateScrollDistance(int velocityX, int velocityY)
+    -boolean snapFromFling(LayoutManager layoutManager, int velocityX, int velocityY)
+    #void snapToTargetExistingView()
+    #LinearSmoothScroller createSnapScroller(LayoutManager layoutManager)
+    +{abstract} int[] calculateDistanceToFinalSnap(LayoutManager layoutManager, View targetView)
+    +{abstract} View findSnapView(LayoutManager layoutManager)
+    +{abstract} int findTargetSnapPosition(LayoutManager layoutManager, int velocityX, int velocityY)
+}
+
+OnFlingListener <|-- SnapHelper
+SnapHelper --> RecyclerView
+SnapHelper --> OnScrollListener
+
+
+class PagerSnapHelper{
+    -OrientationHelper mVerticalHelper
+    -OrientationHelper mHorizontalHelper
+    +int[] calculateDistanceToFinalSnap(LayoutManager layoutManager, View targetView)
+    +View findSnapView(LayoutManager layoutManager)
+    +int findTargetSnapPosition(LayoutManager layoutManager, int velocityX, int velocityY)
+    #LinearSmoothScroller createSnapScroller(RecyclerView.LayoutManager layoutManager)
+    -int distanceToCenter(RecyclerView.LayoutManager layoutManager,View targetView, OrientationHelper helper)
+    -View findCenterView(RecyclerView.LayoutManager layoutManager,OrientationHelper helper)
+    -View findStartView(RecyclerView.LayoutManager layoutManager,OrientationHelper helper)
+    -OrientationHelper getVerticalHelper(RecyclerView.LayoutManager layoutManager)
+    -OrientationHelper getHorizontalHelper(RecyclerView.LayoutManager layoutManager)
+}
+
+class LinearSnapHelper{
+    -OrientationHelper mVerticalHelper
+    -OrientationHelper mHorizontalHelper
+    +int[] calculateDistanceToFinalSnap(LayoutManager layoutManager, View targetView)
+    +View findSnapView(LayoutManager layoutManager)
+    +int findTargetSnapPosition(LayoutManager layoutManager, int velocityX, int velocityY)
+    #LinearSmoothScroller createSnapScroller(RecyclerView.LayoutManager layoutManager)
+    -int distanceToCenter(RecyclerView.LayoutManager layoutManager,View targetView, OrientationHelper helper)
+    -View findCenterView(RecyclerView.LayoutManager layoutManager,OrientationHelper helper)
+    -int estimateNextPositionDiffForFling(RecyclerView.LayoutManager layoutManager,OrientationHelper helper, int velocityX, int velocityY)
+    -float computeDistancePerChild(RecyclerView.LayoutManager layoutManager,OrientationHelper helper)
+    -OrientationHelper getVerticalHelper(RecyclerView.LayoutManager layoutManager)
+    -OrientationHelper getHorizontalHelper(RecyclerView.LayoutManager layoutManager)
+}
+
+SnapHelper <|-- LinearSnapHelper
+SnapHelper <|-- PagerSnapHelper
+
+LinearSnapHelper --> OrientationHelper
+PagerSnapHelper --> OrientationHelper
+
+
+
+}
+@enduml

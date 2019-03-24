@@ -1,0 +1,46 @@
+@startuml
+
+activate SnapHelper #pink
+
+box "RecyclerView" #lightblue
+
+participant LayoutManager << (C,#ADD1B2)  >>
+
+participant SmoothScroller << (C,#ADD1B2)  >>
+participant ViewFlinger << (C,#ADD1B2)  >>
+note over ViewFlinger:This is a Runnable
+end box
+
+box "View" #lightgrey
+
+participant ViewCompat << (C,#ADD1B2)  >>
+
+participant View << (C,#ADD1B2)  >>
+
+end box
+
+SnapHelper -> LayoutManager :snapFromFling
+
+LayoutManager-> SmoothScroller : startSmoothScroll
+
+SmoothScroller -> ViewFlinger: start
+
+ViewFlinger -> ViewCompat :postOnAnimation
+
+ViewCompat -> View : postOnAnimation
+
+View --> ViewFlinger : postDelayed
+
+ViewFlinger --> SmoothScroller : run
+
+SmoothScroller --> SmoothScroller : onAnimation
+
+SmoothScroller --> SmoothScroller : onTargetFound
+
+SmoothScroller ->SnapHelper : calculateDistanceToFinalSnap
+
+
+
+deactivate SnapHelper
+
+@enduml

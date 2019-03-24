@@ -60,7 +60,7 @@ public class DemoRecyclerViewActivity extends AppCompatActivity {
 //		snapHelper.attachToRecyclerView(rvDemo);
 //		HorizontalLinearSnapHelper snapHelper = new HorizontalLinearSnapHelper(this, HorizontalLinearSnapHelper.ALIGN_START, -1, 40f, false);
 //		HorizontalLinearSnapHelper snapHelper = new HorizontalLinearSnapHelper(this, HorizontalLinearSnapHelper.ALIGN_CENTER, 9, 40f, false);
-		HorizontalLinearSnapHelper snapHelper = new HorizontalLinearSnapHelper(this, HorizontalLinearSnapHelper.ALIGN_END, 8, 40f, false);
+		HorizontalLinearSnapHelper snapHelper = new HorizontalLinearSnapHelper(this, HorizontalLinearSnapHelper.ALIGN_END, 8, 40f, true);
 //		HorizontalLinearSnapHelper snapHelper = new HorizontalLinearSnapHelper(this, HorizontalLinearSnapHelper.ALIGN_SPECIAL, -1, 80f, false);
 //
 

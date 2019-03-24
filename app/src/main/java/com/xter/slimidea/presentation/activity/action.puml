@@ -1,0 +1,22 @@
+@startuml
+
+box "RecyclerView" #lightblue
+
+participant Action << (C,#ADD1B2)  >>
+
+participant SmoothScroller << (C,#ADD1B2)  >>
+
+participant ViewFlinger << (C,#ADD1B2)  >>
+note over ViewFlinger:This is a Runnable
+
+Action -> Action : update
+SmoothScroller -> SmoothScroller : onAnimation
+SmoothScroller -> SmoothScroller : onTargetFound
+SmoothScroller -> Action
+Action -> ViewFlinger : runIfNecessary
+
+ViewFlinger -> ViewFlinger : smoothScrollBy
+ViewFlinger -> ViewFlinger : postOnAnimation
+ViewFlinger -> SmoothScroller : run
+SmoothScroller -> SmoothScroller : onAnimation
+@enduml
